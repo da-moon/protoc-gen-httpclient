@@ -1,0 +1,31 @@
+{{ define "Serialization" }}
+{{ $type := .Type }}
+{{ $fieldImport := .FieldImport }}
+{{ $base := .Base }}
+{{ $lowercase := .Lowercase }}
+{{ $dotNotation := .DotNotation }}
+{{ $paramCase := .ParamCase }}
+
+    {{if $type }}
+        type Tmp{{$type}}Struct struct{
+        {{ range $fieldImport }}
+             {{.Name}} reflect.Type `xml:"{{.Tag}}"`
+        {{end}}
+        }
+        func Encode{{$type}}ToJSON (input {{$type}}) ([]byte,error){
+        result, err := json.Marshal(input)
+        if err != nil {
+            return nil, stacktrace.Propagate(err, "[Encode JSON] Encoding {{$type}} to JSON Failed with input arg %v",input)
+        }
+        return result,nil
+        }
+        func Decode{{$type}}FromJSON (input []byte) (*{{$type}},error){
+            result:=&{{$type}}{}
+            err := json.Unmarshal(input, result)
+            if err != nil {
+                return nil, stacktrace.Propagate(err, "[Decode JSON] Encoding {{$type}} from JSON Failed with input arg %x",input)
+            }
+            return result,nil
+        }
+    {{ end }}
+{{ end }}

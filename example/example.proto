@@ -1,0 +1,67 @@
+syntax = "proto3";
+
+package example;
+import "github.com/bifrostcloud/protoc-gen-httpclient/proto/types.proto";
+service DaemonService {
+    option (service_options) = {
+        auth :  "basic"
+        endpoint :  "http://localhost:8080"
+    };
+    rpc Stop (StopRequest) returns (StopResponse){
+        option (request_options) = {
+            client_type :  "circuit-breaker"
+            target: "/daemon/stop"
+            useragent: "Sia-Agent"
+            method : "get"
+        };
+    };
+    rpc Version(VersionRequest)returns (VersionResponse){
+        option (request_options) = {
+            client_type :  "basic"
+            target: "/daemon/version"
+            useragent: "Sia-Agent"
+            method : "put"
+        };
+    };
+    rpc DeleteInfo(VersionRequest)returns (VersionResponse){
+        option (request_options) = {
+            client_type :  "basic"
+            target: "/host"
+            useragent: "Sia-Agent"
+            method : "delete"
+        };
+    };
+    rpc Configure(VersionRequest)returns (VersionResponse){
+        option (request_options) = {
+            client_type :  "basic"
+            target: "/host"
+            useragent: "Sia-Agent"
+            method : "post"
+            params : {
+                key : "key-",
+                value : "value-1",
+            },
+            params : {
+                key : "key-2",
+                value : "value-2",
+            }
+        };
+    };
+}
+message StopRequest {
+	string status =1 ; 
+	string message =2; 
+	string some_other =3 ; 
+}
+message StopResponse {
+	string status =1 ; 
+	string message = 2 ; 
+}
+message VersionRequest {
+    string status =1 ; 
+	bool boolean =2;  
+	uint32 integer =3;  
+}
+message VersionResponse {
+	string version = 3 ; 
+}
